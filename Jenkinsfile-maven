@@ -26,6 +26,9 @@ pipeline {
 
 
         stage('clean') {
+            when {
+                 expression { env.Clean== "Yes" }
+            }
             agent {
                 docker {
                     image 'maven:3.8.5-openjdk-18'
@@ -151,7 +154,7 @@ pipeline {
  
             steps {
                 sh '''
-                 docker build -t devopseasylearning2021/eric:$ImageTag -f apache.Dockerfile .
+                 docker build -t devopseasylearning2021/erico:$ImageTag -f apache.Dockerfile .
                 '''
             }
         }
