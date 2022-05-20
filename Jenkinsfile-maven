@@ -28,6 +28,11 @@ pipeline {
                                 choices: ['Docker', 'Docker-compose', 'K8S'], 
                                 name: 'environment'
                             ),
+
+                            choice(
+                                choices: ['8081', '8082', '8083', '8051', '8053', '7082', '6083', '5082', '4083'], 
+                                name: 'Port'
+                            ),
                        
                             string(
                                 defaultValue: '1.0.0', 
@@ -204,7 +209,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f odilia || true
-                 docker run -d --name odilia -p 8081:80 devopseasylearning2021/eric:$ImageTag 
+                 docker run -d --name odilia -p $Port:80 devopseasylearning2021/eric:$ImageTag 
 
                  curl ifconfig.co
                 '''
@@ -220,6 +225,7 @@ pipeline {
             steps {
                 sh '''
 docker-compose down 
+docker rm -f odilia || true
 rm -rf docker-compose.yml || true
 cat <<EOF > docker-compose.yml
 version: "3"
@@ -230,7 +236,7 @@ services:
        expose:
         - 80
        ports:
-         - 8081:80
+         - $Port:80
 EOF
 
 ls -l 
