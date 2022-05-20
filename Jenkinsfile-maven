@@ -160,7 +160,16 @@ pipeline {
         }
 
 
-
+        stage('deploy') {
+ 
+            steps {
+                sh '''
+                docker rm -f odilia || true
+                 docker run -d --name odilia -p 8081:80 devopseasylearning2021/erico:$ImageTag 
+                 curl ifconfig.co
+                '''
+            }
+        }
 
  
     }
