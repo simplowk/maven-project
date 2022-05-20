@@ -79,7 +79,7 @@ pipeline {
         stage('verify') {
             agent {
                 docker {
-                    image 'maven:3.8.5-openjdk-18'
+                    image 'maven:3.6.0-jdk-11-slim'
                 }
             }
             steps {
