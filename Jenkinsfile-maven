@@ -1,6 +1,17 @@
 pipeline {
     agent any
 
+ options { buildDiscarder(logRotator(artifactDaysToKeepStr: '',
+     artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5'))
+      disableConcurrentBuilds() }
+
+
+
+    environment {
+		DOCKERHUB_CREDENTIALS=credentials('dockerhub')
+	}
+
+
     stages {
         
         stage('Setup parameters') {
@@ -11,6 +22,11 @@ pipeline {
                             choice(
                                 choices: ['No', 'Yes'], 
                                 name: 'Clean'
+                            ),
+
+                            choice(
+                                choices: ['Docker', 'Docker-compose', 'K8S'], 
+                                name: 'environment'
                             ),
                        
                             string(
@@ -154,24 +170,90 @@ pipeline {
  
             steps {
                 sh '''
-                 docker build -t devopseasylearning2021/erico:$ImageTag -f apache.Dockerfile .
+                 docker build -t devopseasylearning2021/eric:$ImageTag -f apache.Dockerfile .
                 '''
             }
         }
 
 
-        stage('deploy') {
+             stage('Docker Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+
+           
+            
+
+     stage('Docker push ') {
+            steps {
+               sh '''
+              docker push devopseasylearning2021/eric:$ImageTag
+                '''
+            }
+        }
+
+
+
+        stage('deploy with docker') {
+            when {
+                 expression { env.environment== "Docker" }
+            }
  
             steps {
                 sh '''
                 docker rm -f odilia || true
-                 docker run -d --name odilia -p 8081:80 devopseasylearning2021/erico:$ImageTag 
+                 docker run -d --name odilia -p 8081:80 devopseasylearning2021/eric:$ImageTag 
+
                  curl ifconfig.co
                 '''
             }
         }
 
  
+        stage('deploy with compose') {
+            when {
+                 expression { env.environment== "Docker-compose" }
+            }
+ 
+            steps {
+                sh '''
+docker-compose down 
+rm -rf docker-compose.yml || true
+cat <<EOF > docker-compose.yml
+version: "3"
+services:
+    tomcat:
+       image: devopseasylearning2021/eric:$ImageTag 
+       container_name: odilia
+       expose:
+        - 80
+       ports:
+         - 8081:80
+EOF
+
+ls -l 
+docker compose up -d
+'''
+            }
+        }
+
+        
+         stage('deploy with kubernetes') {
+             when {
+                 expression { env.environment== "K8S" }
+            }
+ 
+            steps {
+                sh '''
+                ls
+                '''
+            }
+        }
+
+
+
     }
 
 
