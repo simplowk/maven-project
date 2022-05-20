@@ -93,7 +93,7 @@ pipeline {
         stage('install') {
             agent {
                 docker {
-                    image 'maven:maven:3.6.0-jdk-11-slim'
+                    image 'maven:3.6.0-jdk-11-slim'
                 }
             }
             steps {
