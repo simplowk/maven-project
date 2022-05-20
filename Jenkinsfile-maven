@@ -3,6 +3,27 @@ pipeline {
 
     stages {
         
+        stage('Setup parameters') {
+            steps {
+                script { 
+                    properties([
+                        parameters([
+                            choice(
+                                choices: ['No', 'Yes'], 
+                                name: 'Clean'
+                            ),
+                       
+                            string(
+                                defaultValue: '1.0.0', 
+                                name: 'ImageTag', 
+                                trim: true
+                            )
+                        ])
+                    ])
+                }
+            }
+        }
+
 
         stage('clean') {
             agent {
@@ -123,6 +144,20 @@ pipeline {
                 }
             }
         }
+
+
+
+        stage('build images') {
+ 
+            steps {
+                sh '''
+                 docker build -t devopseasylearning2021/eric:$ImageTag -f apache.Dockerfile .
+                '''
+            }
+        }
+
+
+
 
  
     }
