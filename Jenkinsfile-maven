@@ -210,8 +210,7 @@ pipeline {
                 sh '''
                 docker rm -f odilia || true
                  docker run -d --name odilia -p $Port:80 devopseasylearning2021/eric:$ImageTag 
-
-                 curl ifconfig.co
+                 docker ps -a 
                 '''
             }
         }
@@ -239,8 +238,9 @@ services:
          - $Port:80
 EOF
 
-ls -l 
+cat docker-compose.yml
 docker compose up -d
+docker-compose ps 
 '''
             }
         }
