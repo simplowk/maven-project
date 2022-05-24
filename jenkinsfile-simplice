@@ -5,10 +5,9 @@ label 'jenkins-node'
 environment {
 		DOCKERHUB_CREDENTIALS=credentials('dockerhub')
 	}
-
-    options { buildDiscarder(logRotator(artifactDaysToKeepStr: '',
-     artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5'))
-      disableConcurrentBuilds() }
+options { buildDiscarder(logRotator(artifactDaysToKeepStr: '',
+artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5'))
+disableConcurrentBuilds() }
       
 
     stages {
